@@ -1,4 +1,4 @@
-% File Name: Individual.m -----------------------------------------------------+
+% File Name: individual.m -----------------------------------------------------+
 % -----------------------------------------------------------------------------+
 %
 %   Miguel G. Oliveira
@@ -10,7 +10,7 @@
 % -----------------------------------------------------------------------------+
 
 % INDIVIDUAL CLASS ------------------------------------------------------------+
-classdef Individual
+classdef de_individual
     properties
         Cost
         Position
@@ -18,7 +18,7 @@ classdef Individual
         Penalty
     end
     methods
-        function self = Individual(D,bounds_x,initial)
+        function self = de_individual(D,bounds_x,initial)
             
             self.Cost = -1;              % individual cost
             self.Position = [];          % individual position

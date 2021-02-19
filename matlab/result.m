@@ -6,7 +6,6 @@
 %   MSc in Mechanical Engineer
 %   University of Aveiro
 %
-% Description:  --------------------------+
 % -----------------------------------------------------------------------------+
 
 function [Evolution,EvolutionPosition,EvolutionConstraints,EvolutionPenalty,...

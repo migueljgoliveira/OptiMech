@@ -6,24 +6,30 @@
 %   MSc in Mechanical Engineer
 %   University of Aveiro
 %
-% Description:  --------------------------+
 % -----------------------------------------------------------------------------+
 
-function [D,bounds_x,Best] = setting()
+function [D,G,bounds_x,bounds_v] = setting()
     % Number of Design Variables
-    D = 7;
+    D = 3;
+    
+    % Number of Constraints
+    G = 0;
+    
     % Search Range of Design Variables
-    bound_x1 = [2.6 3.6];  % Face Width
-    bound_x2 = [0.7 0.8];  % Module of Teeth
-    bound_x3 = [17 29];    % Number of Teeth Pinion
-    bound_x4 = [7.3 8.3]; % Lenght First Shaft
-    bound_x5 = [7.8 8.3]; % Lenght Second Shaft
-    bound_x6 = [2.9 3.9];  % Diameter First Shaft
-    bound_x7 = [5.0 5.5];  % Diameter Second Shaft
+    bound_x1 = [0 2];
+    bound_x2 = [0 2];
+    bound_x3 = [0 2];
+
+    bounds_x = [bound_x1;bound_x2;bound_x3];
     
-    bounds_x = [bound_x1;bound_x2;bound_x3;bound_x4;bound_x5;bound_x6;bound_x7];
-    
-    Best = 2996.348165;
+    % Velocity Range of Design Variables (only for PSO)
+    bounds_v = zeros(D,2);
+    for i = 1:D
+        vmax = (bounds_x(i,2) - bounds_x(i,1))/2;
+        vmin = - vmax;
+        bound_v = [vmin vmax];
+        bounds_v(i,:) = bound_v;
+    end
 end
 
 % END -------------------------------------------------------------------------+

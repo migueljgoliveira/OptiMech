@@ -1,4 +1,4 @@
-% File Name: PostProcessing.m -------------------------------------------------+
+% File Name: postprocessing.m -------------------------------------------------+
 % -----------------------------------------------------------------------------+
 %
 %   Miguel G. Oliveira
@@ -6,35 +6,34 @@
 %   MSc in Mechanical Engineer
 %   University of Aveiro
 %
-% Description:  --------------------------+
 % -----------------------------------------------------------------------------+
 
 % MAIN ------------------------------------------------------------------------+
 
-function PostProcessing(fe,ps,runs,gens,Best,Evolution,EvolutionPosition,...
+function postprocessing(D,G,fe,ps,runs,gens,Evolution,EvolutionPosition,...
         EvolutionConstraints,EvolutionPenalty,BestPosition,BestCost,BestConstraint,...
         BestPenalty,BestEval,run_timer,total_time)
     
     [Evolution,EvolutionPenalty,BestPosition,BestCost,BestConstraint,BestPenalty,...
         BestEval,WorstCost,mean_BestCost,mean_BestEval,std_BestCost,std_BestEval,...
-        Success,mean_run_timer,Evol_X,Evol_G,gen] = post(runs,gens,Best,Evolution,EvolutionPosition,...
+        mean_run_timer,Evol_X,Evol_G,gen] = post(D,G,runs,gens,Evolution,EvolutionPosition,...
         EvolutionConstraints,EvolutionPenalty,BestPosition,BestCost,BestConstraint,...
         BestPenalty,BestEval,run_timer);
    
    	write(gen,fe,ps,runs,Evolution,EvolutionPenalty,BestPosition,BestCost,...
         BestConstraint,BestPenalty,BestEval,WorstCost,mean_BestCost,mean_BestEval,...
-        std_BestCost,std_BestEval,Success,mean_run_timer,total_time,Evol_X,Evol_G);
+        std_BestCost,std_BestEval,mean_run_timer,total_time,Evol_X,Evol_G);
     
     visual(BestPosition,BestCost,BestConstraint,BestPenalty,BestEval,WorstCost,...
-        mean_BestCost,mean_BestEval,std_BestCost,std_BestEval,Success,Evolution,...
-        EvolutionPenalty,Evol_X,Evol_G,mean_run_timer,total_time,gen,fe);
+        mean_BestCost,mean_BestEval,std_BestCost,std_BestEval,Evolution,...
+        Evol_X,mean_run_timer,total_time,D,gen,fe);
     
 end
 
 % POST-PROCESSING -------------------------------------------------------------+
 function [Evolution,EvolutionPenalty,BestPosition,BestCost,BestConstraint,BestPenalty,...
         BestEval,WorstCost,mean_BestCost,mean_BestEval,std_BestCost,std_BestEval,...
-        Success,mean_run_timer,Evol_X,Evol_G,gen] = post(runs,gens,Best,Evolution,EvolutionPosition,...
+        mean_run_timer,Evol_X,Evol_G,gen] = post(D,G,runs,gens,Evolution,EvolutionPosition,...
         EvolutionConstraints,EvolutionPenalty,BestPosition,BestCost,BestConstraint,...
         BestPenalty,BestEval,run_timer)
     
@@ -66,14 +65,6 @@ function [Evolution,EvolutionPenalty,BestPosition,BestCost,BestConstraint,BestPe
 	BestPosition = BestPosition(BestCost_i,:);
 	% Constraints for Best Cost
 	BestConstraint = BestConstraint(BestCost_i,:);
-    % Success Rate
-	s = 0;
-	for j = 1:length(BestCost)
-		if BestCost(j) <= Best
-			s = s + 1;
-        end
-    end
-	Success = 100*(s/runs);
     % Penalty for Best Cost
 	BestPenalty = BestPenalty(BestCost_i);
     % Mean of Best Cost of all runs
@@ -89,71 +80,35 @@ function [Evolution,EvolutionPenalty,BestPosition,BestCost,BestConstraint,BestPe
 	% Evolution Mean for X Runs
 	Evolution = mean(Evolution,1);
     % Evolution of Design Variables
-    Evol_X1 = zeros(runs, gen);
-	Evol_X2 = zeros(runs, gen);
-	Evol_X3 = zeros(runs, gen);
-	Evol_X4 = zeros(runs, gen);
-	Evol_X5 = zeros(runs, gen);
-	Evol_X6 = zeros(runs, gen);
-	Evol_X7 = zeros(runs, gen);
+    Evol_X = zeros(runs, gen, D);
     for i = 1:runs
         for j = 1:gen
-            Evol_X1(i,j) = EvolutionPosition{i}(j,1);
-            Evol_X2(i,j) = EvolutionPosition{i}(j,2);
-            Evol_X3(i,j) = EvolutionPosition{i}(j,3);
-            Evol_X4(i,j) = EvolutionPosition{i}(j,4);
-            Evol_X5(i,j) = EvolutionPosition{i}(j,5);
-            Evol_X6(i,j) = EvolutionPosition{i}(j,6);
-            Evol_X7(i,j) = EvolutionPosition{i}(j,7);
+            for k = 1:D
+                Evol_X(i,j,k) = EvolutionPosition{i}(j,k);
+            end
         end        
     end
-    Evol_X1 = mean(Evol_X1,1);
-	Evol_X2 = mean(Evol_X2,1);
-	Evol_X3 = mean(Evol_X3,1);
-	Evol_X4 = mean(Evol_X4,1);
-	Evol_X5 = mean(Evol_X5,1);
-	Evol_X6 = mean(Evol_X6,1);
-	Evol_X7 = mean(Evol_X7,1);
-    Evol_X = [Evol_X1;Evol_X2;Evol_X3;Evol_X4;Evol_X5;Evol_X6;Evol_X7];
+    Evol_X = mean(Evol_X,1);
+    pEvol_X = zeros(gen,D);
+    for i = 1:D
+        pEvol_X(:,i) = Evol_X(:,:,i);
+    end
+    Evol_X = pEvol_X';
     % Evolution of Constraints
-    Evol_G1 = zeros(runs, gen);
-	Evol_G2 = zeros(runs, gen);
-	Evol_G3 = zeros(runs, gen);
-	Evol_G4 = zeros(runs, gen);
-	Evol_G5 = zeros(runs, gen);
-	Evol_G6 = zeros(runs, gen);
-	Evol_G7 = zeros(runs, gen);
-    Evol_G8 = zeros(runs, gen);
-    Evol_G9 = zeros(runs, gen);
-    Evol_G10 = zeros(runs, gen);
-    Evol_G11 = zeros(runs, gen);
+    Evol_G = zeros(runs, gen, G);
     for i = 1:runs
         for j = 1:gen
-            Evol_G1(i,j) = EvolutionConstraints{i}(j,1);
-            Evol_G2(i,j) = EvolutionConstraints{i}(j,2);
-            Evol_G3(i,j) = EvolutionConstraints{i}(j,3);
-            Evol_G4(i,j) = EvolutionConstraints{i}(j,4);
-            Evol_G5(i,j) = EvolutionConstraints{i}(j,5);
-            Evol_G6(i,j) = EvolutionConstraints{i}(j,6);
-            Evol_G7(i,j) = EvolutionConstraints{i}(j,7);
-            Evol_G8(i,j) = EvolutionConstraints{i}(j,8);
-            Evol_G9(i,j) = EvolutionConstraints{i}(j,9);
-            Evol_G10(i,j) = EvolutionConstraints{i}(j,10);
-            Evol_G11(i,j) = EvolutionConstraints{i}(j,11);
+            for k = 1:G
+                Evol_G(i,j,k) = EvolutionConstraints{i}(j,k);
+            end
         end        
     end
-    Evol_G1 = mean(Evol_G1,1);
-	Evol_G2 = mean(Evol_G2,1);
-	Evol_G3 = mean(Evol_G3,1);
-	Evol_G4 = mean(Evol_G4,1);
-	Evol_G5 = mean(Evol_G5,1);
-	Evol_G6 = mean(Evol_G6,1);
-	Evol_G7 = mean(Evol_G7,1);
-    Evol_G8 = mean(Evol_G8,1);
-    Evol_G9 = mean(Evol_G9,1);
-    Evol_G10 = mean(Evol_G10,1);
-    Evol_G11 = mean(Evol_G11,1);
-    Evol_G = [Evol_G1;Evol_G2;Evol_G3;Evol_G4;Evol_G5;Evol_G6;Evol_G7;Evol_G8;Evol_G9;Evol_G10;Evol_G11];
+    Evol_G = mean(Evol_G,1);
+    pEvol_G = zeros(gen,G);
+    for i = 1:G
+        pEvol_G(:,i) = Evol_G(:,:,i);
+    end
+    Evol_G = pEvol_G';
     % Evolution Penalty Mean for X Runs
 	EvolutionPenalty = mean(EvolutionPenalty,1);
 	% Mean Time of Run
@@ -164,9 +119,10 @@ end
 % WRITE TO FILES --------------------------------------------------------------+
 function write(gen,fe,ps,runs,Evolution,EvolutionPenalty,BestPosition,BestCost,...
         BestConstraint,BestPenalty,BestEval,WorstCost,mean_BestCost,mean_BestEval,...
-        std_BestCost,std_BestEval,Success,mean_run_timer,total_time,Evol_X,Evol_G)
+        std_BestCost,std_BestEval,mean_run_timer,total_time,Evol_X,Evol_G)
     
     today = datetime('now');
+   
     Evol_X = Evol_X';
     Evol_G = Evol_G';
     file = fopen('Results.txt','w'); 
@@ -180,10 +136,10 @@ function write(gen,fe,ps,runs,Evolution,EvolutionPenalty,BestPosition,BestCost,.
     for i = 1:gen
         fprintf(file,[sprintf('%.6f',Evolution(i)),'\n']);
     end
-    fprintf(file,['\n','+++ DESIGN VARIABLES EVOLUTION +++','\n']);
-    dlmwrite('Results.txt',Evol_X,'delimiter','\t','precision','%.6f','-append');
-    fprintf(file,['\n','+++ CONSTRAINTS EVOLUTION +++','\n']);
-    dlmwrite('Results.txt',Evol_G,'delimiter','\t','precision','%.6f','-append');
+%     fprintf(file,['\n','+++ DESIGN VARIABLES EVOLUTION +++','\n']);
+%     dlmwrite('Results.txt',Evol_X,'delimiter','\t','precision','%.6f','-append')
+%     fprintf(file,['\n','+++ CONSTRAINTS EVOLUTION +++','\n']);
+%     dlmwrite('Results.txt',Evol_G,'delimiter','\t','precision','%.6f','-append');
     fprintf(file,['\n','+++ PENALTY EVOLUTION +++','\n\n']);
     for i = 1:gen
         fprintf(file,[sprintf('%.6f',EvolutionPenalty(i)),'\n']);
@@ -196,7 +152,6 @@ function write(gen,fe,ps,runs,Evolution,EvolutionPenalty,BestPosition,BestCost,.
 	fprintf(file,['Worst Cost: ',sprintf('%.6f',WorstCost),'\n']);
 	fprintf(file,['Mean Best Cost: ',sprintf('%.6f',mean_BestCost),'\n']);
 	fprintf(file,['Std. Best Cost: ' sprintf('%.6f',std_BestCost),'\n']);
-    fprintf(file,['Success Rate: ',num2str(Success),'\n']);
     fprintf(file,['Evaluations: ',num2str(BestEval),'\n']);
     fprintf(file,['Mean Evaluations: ',num2str(mean_BestEval),'\n']);
     fprintf(file,['Std. Evaluations: ',num2str(std_BestEval),'\n']);
@@ -210,8 +165,8 @@ end
 
 % VISUALISATION ---------------------------------------------------------------+
 function visual(BestPosition,BestCost,BestConstraint,BestPenalty,BestEval,WorstCost,...
-        mean_BestCost,mean_BestEval,std_BestCost,std_BestEval,Success,Evolution,...
-        EvolutionPenalty,Evol_X,Evol_G,mean_run_timer,total_time,gen,fe)
+        mean_BestCost,mean_BestEval,std_BestCost,std_BestEval,Evolution,...
+        Evol_X,mean_run_timer,total_time,D,gen,fe)
     
     fprintf('\n + --------- FINAL RESULTS --------- + \n')
 	fprintf(['Best Position: [',num2str(round(BestPosition,6)),']\n']);
@@ -221,7 +176,6 @@ function visual(BestPosition,BestCost,BestConstraint,BestPenalty,BestEval,WorstC
 	fprintf(['Worst Cost: ',sprintf('%.6f',WorstCost),'\n']);
 	fprintf(['Mean Best Cost: ',sprintf('%.6f',mean_BestCost),'\n']);
 	fprintf(['Std. Best Cost: ' sprintf('%.6f',std_BestCost),'\n']);
-	fprintf(['Success Rate: ',num2str(Success),'\n']);
     fprintf(['Evaluations: ',num2str(BestEval),'\n']);
     fprintf(['Mean Evaluations: ',num2str(mean_BestEval),'\n']);
     fprintf(['Std. Evaluations: ',num2str(std_BestEval),'\n']);
@@ -229,56 +183,25 @@ function visual(BestPosition,BestCost,BestConstraint,BestPenalty,BestEval,WorstC
 	fprintf(['Total Time: ',num2str(total_time,10),' sec\n']);
 	fprintf('\nOptimization Complete! See Results :) \n');
     
-%     f1 = figure('visible','off');
-%     Evals = linspace(1,fe,gen);
-%     plot(Evals,Evolution);
-%     title('Speed Reducer')
-%     xlabel('Function Evaluations')
-%     ylabel('Cost')
-%     xlim([1 fe])
-%     grid on
-%     FileName = fullfile('Results','R_Cost.png');
-%     saveas(f1,FileName);
-%     
-%     lines = {'s','*','+','p','h','x','.'};
-%     f2 = figure('visible','off');
-%     for i = 1:7
-%         plot(Evals,Evol_X(i,:),['-',lines{i}],'MarkerSize',2);
-%         hold on
-%     end
-%     title('Speed Reducer')
-%     xlabel('Function Evaluations')
-%     ylabel('Design Variable')
-%     axis([1 fe 0 28])
-%     legend('X1','X2','X3','X4','X5','X6','X7','Location','East');
-%     grid on
-%     FileName = fullfile('Results','R_Variables.png');
-%     saveas(f2,FileName);
-%    
-%     lines = {'s','*','+','p','h','x','.','p','h','x','.','p','h','x','.'};
-%     f3 = figure('visible','off');
-%     for i = 1:11
-%         plot(Evals,Evol_G(i,:),['-',lines{i}],'MarkerSize',2);
-%         hold on
-%     end
-%     title('Speed Reducer')
-%     xlabel('Function Evaluations')
-%     ylabel('Constraints')
-%     axis([1 fe -1 0.2])
-%     legend('G1','G2','G3','G4','G5','G6','G7','G8','G9','G10','G11','Location','East');
-%     grid on
-%     FileName = fullfile('Results','R_Constraints.png');
-%     saveas(f3,FileName);
-%     
-%     f4 = figure('visible','off');
-%     plot(Evals,EvolutionPenalty);
-%     title('Speed Reducer')
-%     xlabel('Function Evaluations')
-%     ylabel('Penalty')
-%     xlim([1 fe])
-%     grid on
-%     FileName = fullfile('Results','R_Penalty.png');
-%     saveas(f4,FileName);
+    f1 = figure('visible','off');
+    Evals = linspace(1,fe,gen);
+    plot(Evals,Evolution);
+    xlabel('Function Evaluations')
+    ylabel('Cost')
+    xlim([1 fe])
+    grid on
+    saveas(f1,'Cost.png');
+    f2 = figure('visible','off');
+    for i = 1:D
+        plot(Evals,Evol_X(i,:),'-','MarkerSize',2);
+        hold on
+    end
+    xlabel('Function Evaluations')
+    ylabel('Design Variable')
+    xlim([1 fe])
+    grid on
+    saveas(f2,'Variables.png');
+
 end
 
 % END -------------------------------------------------------------------------+

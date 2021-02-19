@@ -1,4 +1,4 @@
-# File Name: Run.py ----------------------------------------------------------+
+# File Name: main.py ---------------------------------------------------------+
 # ----------------------------------------------------------------------------+
 #
 #   Miguel G. Oliveira
@@ -23,17 +23,20 @@ from postprocessing import variables, result, post, write, visual
 # MAIN -----------------------------------------------------------------------+
 def main():
 	print ('+++ OptiMech +++')
+
+	# GENERAL SETTINGS -------------------------------------------------------+
 	algo = 'tlbo'
 	parallel = False
 	nproc = 2
 
-	# PARAMETERS SETTING --------------------------------------------------+
+	# PARAMETERS SETTING -----------------------------------------------------+
 	# Function Independent Parameters
-	runs, fe = 2, 20000
+	runs = 2
+	fe = 20000
 
 	# Function Dependent Parameters
 	D,bounds_x,bounds_v = setting()
-	ps = 6*D
+	ps = 10*D
 
 	#Call 'variables' function from PostProcessing
 	Evolution,EvolutionPosition,EvolutionConstraints,EvolutionPenalty,BestPosition,BestCost,BestConstraint,BestPenalty,BestEval,run_timer,gens = variables()

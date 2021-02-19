@@ -1,4 +1,4 @@
-% File Name: SDE.m ------------------------------------------------------------+
+% File Name: de.m -------------------------------------------------------------+
 % -----------------------------------------------------------------------------+
 %
 %   Miguel G. Oliveira
@@ -6,12 +6,10 @@
 %   MSc in Mechanical Engineer
 %   University of Aveiro
 %
-% Description:  --------------------------+
 % -----------------------------------------------------------------------------+
 
 function [Cost_Best,Position_Best,Constraint_Best,Penalty_Best,...
-        Evol,EvolPos,EvolCons,EvolPen,gen,Best_Eval] = ...
-        SDE(costFunc,initial,bounds_x,ps,D,fe,Best)
+        Evol,EvolPos,EvolCons,EvolPen,gen,Best_Eval] = de(costFunc,initial,bounds_x,ps,D,fe)
     
     Cost_Best = -1;       % Best Cost for Population
     Position_Best = [];   % Best Position for Population
@@ -22,7 +20,7 @@ function [Cost_Best,Position_Best,Constraint_Best,Penalty_Best,...
     % Establish Population
     Population = {};
     for i = 1:ps
-        Population{i} = Individual(D,bounds_x,initial);
+        Population{i} = de_individual(D,bounds_x,initial);
     end
     
     % cycle through individual in population and evaluate fitness
@@ -61,7 +59,7 @@ function [Cost_Best,Position_Best,Constraint_Best,Penalty_Best,...
             Target_3 = Population{random_index(3)};
             
             % generate mutant vector
-            Mutant = Individual(D,bounds_x,initial);
+            Mutant = de_individual(D,bounds_x,initial);
             
             Mutant.Position = Target_1.Position + F*(Target_2.Position - Target_3.Position);
             for n = 1:D                
@@ -73,7 +71,7 @@ function [Cost_Best,Position_Best,Constraint_Best,Penalty_Best,...
             end
             
             % 2. RECOMBINATION ----------------------------------------------- +
-            Trial = Individual(D,bounds_x,initial);
+            Trial = de_individual(D,bounds_x,initial);
             for n = 1:D
                 Crossover = rand();
                 if Crossover <= CR

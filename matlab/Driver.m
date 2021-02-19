@@ -1,4 +1,4 @@
-% File Name: Driver.m ---------------------------------------------------------+
+% File Name: driver.m ---------------------------------------------------------+
 % -----------------------------------------------------------------------------+
 %
 %   Miguel G. Oliveira
@@ -6,18 +6,17 @@
 %   MSc in Mechanical Engineer
 %   University of Aveiro
 %
-% Description:  --------------------------+
 % -----------------------------------------------------------------------------+
 
-function Driver()
+function driver()
     clear; clc; close all;
     
-    fprintf('+++ SPEED REDUCER +++\n')
+    fprintf('+++ OptiMech - Driver +++\n')
     
     x = [3.49999 0.6999 17 7.3 7.8 3.3502 5.2866];
     i = 1;
     
-	[F, Gj, P] = Reducer(x,i);
+	[F, Gj, P] = problem(x,i);
     
 	fprintf(['Cost = ', num2str(F),'\n']) 
     fprintf(['Constraints = [',num2str(Gj),']\n'])
