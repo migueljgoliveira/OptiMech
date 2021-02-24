@@ -1,35 +1,35 @@
-# File Name: main.py ---------------------------------------------------------+
-# ----------------------------------------------------------------------------+
+# File Name: main.py --------------------------------------------------------+
+# ---------------------------------------------------------------------------+
 #
 #   Miguel G. Oliveira
 #   Dissertation
 #   MSc in Mechanical Engineer
 #   University of Aveiro
 #
-# ----------------------------------------------------------------------------+
+# ---------------------------------------------------------------------------+
 
-# IMPORT PACKAGES ------------------------------------------------------------+
+# IMPORT PACKAGES -----------------------------------------------------------+
 import time
 import os
 import multiprocessing as mp
 
-# IMPORT FILES ---------------------------------------------------------------+
+# IMPORT FILES --------------------------------------------------------------+
 from de import de
 from pso import pso
 from tlbo import tlbo
 from problem import setting, costfunc, initial, initial_pso
 from postprocessing import variables, result, post, write, visual
 
-# MAIN -----------------------------------------------------------------------+
+# MAIN ----------------------------------------------------------------------+
 def main():
 	print ('+++ OptiMech +++')
 
-	# GENERAL SETTINGS -------------------------------------------------------+
+	# GENERAL SETTINGS ------------------------------------------------------+
 	algo = 'tlbo'
 	parallel = False
 	nproc = 2
 
-	# PARAMETERS SETTING -----------------------------------------------------+
+	# PARAMETERS SETTING ----------------------------------------------------+
 	# Function Independent Parameters
 	runs = 2
 	fe = 20000
@@ -41,7 +41,7 @@ def main():
 	#Call 'variables' function from PostProcessing
 	Evolution,EvolutionPosition,EvolutionConstraints,EvolutionPenalty,BestPosition,BestCost,BestConstraint,BestPenalty,BestEval,run_timer,gens = variables()
 
-	# RUN --------------------------------------------------------------------+
+	# RUN -------------------------------------------------------------------+
 	total_start_time = time.time()
 
 	# create pool of processes
