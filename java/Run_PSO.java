@@ -1,4 +1,4 @@
-// File Name: run.java -------------------------------------------------------+
+// File Name: RunDE.java -----------------------------------------------------+
 // ---------------------------------------------------------------------------+
 //
 //  Miguel G. Oliveira
@@ -13,14 +13,10 @@ import java.util.*;
 import java.io.*;
 
 // MAIN ----------------------------------------------------------------------+
-public class Run extends DE implements Reducer,PostProcessing {
+public class Run_PSO extends PSO implements Problem,PostProcessing {
 
     public static void main(String []args) throws IOException,InterruptedException {
    		System.out.println("+++ OptiMeta +++");
-
-		// GENERAL SETTINGS --------------------------------------------------+
-		String algo = "de";
-		boolean parallel = false;
 
    		// PARAMETERS SETTING ------------------------------------------------+
 		// Function Independent Parameters
@@ -28,7 +24,7 @@ public class Run extends DE implements Reducer,PostProcessing {
 		int fe = 1000;
 
 		// Function Dependent Parameters
-		Object[] settings = Reducer.setting();
+		Object[] settings = Problem.setting();
 	   	int D = (int)settings[0];
 	   	double[][] bounds_x = (double[][])settings[1];
 		double[][] bounds_v = (double[][])settings[2];
@@ -51,23 +47,13 @@ public class Run extends DE implements Reducer,PostProcessing {
 	   	// RUN ---------------------------------------------------------------+
 	   	long total_start_time = System.nanoTime();
 
-		DE results = null;
 	   	for (int i = 0; i < runs ; i++) {
 	   		System.out.println("Run " + (i+1) + " ...");
 	   		// Starting Time of Run
 	   		long run_start_time = System.nanoTime();
 
-			// DE
-			System.out.println(algo);
-			switch (algo)
-			{
-				case "de":
-					System.out.println(algo);
-					results = new DE(bounds_x,ps,D,fe);
-
-				// case "pso":
-				// 	results = new PSO(bounds_x,bounds_v,ps,D,fe);
-			}
+			// PSO
+			PSO results = new PSO(bounds_x,bounds_v,ps,D,fe);
 
 	   		// Elapsed Time of Run
 	   		long run_time = (System.nanoTime() - run_start_time);

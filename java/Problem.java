@@ -1,4 +1,4 @@
-// File Name: problem.java ---------------------------------------------------+
+// File Name: Problem.java ---------------------------------------------------+
 // ---------------------------------------------------------------------------+
 //
 //  Miguel G. Oliveira
@@ -8,11 +8,8 @@
 //
 // ---------------------------------------------------------------------------+
 
-// IMPORT PACKAGES -----------------------------------------------------------+
-import java.util.*;
-
 // MAIN ----------------------------------------------------------------------+
-public interface Reducer {
+public interface Problem {
 
    // SET DIMENSION AND BOUNDS -----------------------------------------------+
    public static Object[] setting() {
@@ -67,6 +64,31 @@ public interface Reducer {
       }
 
       return x0;
+   }
+
+   // SET INITIAL VALUES -----------------------------------------------------+
+   public static Object[] initial_pso(int D, double [][] bounds_x, double [][] bounds_v) {
+
+      double xval,vval;
+      double[] x0 = new double[D];
+	  double[] v0 = new double[D];
+
+      for (int i = 0; i < D; i++) {
+         xval = bounds_x[i][0]+Math.random()*(bounds_x[i][1]-bounds_x[i][0]);
+		 vval = bounds_v[i][0]+Math.random()*(bounds_v[i][1]-bounds_v[i][0]);
+         if (i == 2) {
+            xval = Math.floor(xval);
+         }
+         x0[i] = xval;
+		 v0[i] = vval;
+      }
+
+	  // Wrap settings into object to return
+	  Object[] init = new Object[2];
+	  init [0] = x0;
+	  init [1] = v0;
+
+      return init;
    }
 
    // OBJECTIVE FUNCTION -----------------------------------------------------+

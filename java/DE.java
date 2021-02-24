@@ -151,7 +151,7 @@ public class DE {
 }
 
 // INDIVIDUAL CLASS ----------------------------------------------------------+
-class Individual implements Reducer{
+class Individual implements Problem{
 
 	double[] position,constraint;
 	double cost,penalty;
@@ -163,13 +163,13 @@ class Individual implements Reducer{
         this.constraint = new double[] {};     	// individual constraints
         this.penalty = -1;    			 	 	// individual penalty
 
-        this.position =  Reducer.initial(D,bounds_x);
+        this.position =  Problem.initial(D,bounds_x);
 	}
 
 	// evaluate current fitness
 	public void evaluate(int i)
 	{
-		Object[] func = Reducer.costFunc(position,i);
+		Object[] func = Problem.costFunc(position,i);
 
 		cost = (double)func[0];
 	   	constraint = (double[])func[1];

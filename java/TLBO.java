@@ -13,30 +13,28 @@
 import java.util.*;
 
 // SWARM CLASS ---------------------------------------------------------------+
-public class STLBO {
+public class TLBO {
 
-	double teacher_Cost,teacher_Penalty,best_Eval;
+	double cost_Best,penalty_Best,best_Eval;
 	double[][] evolPos,evolCons;
-	double[] teacher_Position,teacher_Constraint;
+	double[] position_Best,constraint_Best;
 	ArrayList<Learner> population;
-	ArrayList<Double> evol,evolPen,evaluation_time;
+	ArrayList<Double> evol,evolPen;
 	int gen;
 
-	public STLBO() { super(); }
+	public TLBO() { super(); }
 
-	public STLBO(double[][] bounds_x,int ps,int D,int fe,double Best) {
+	public TLBO(double[][] bounds_x,int ps,int D,int fe) {
 
 		int randIdx;
 		Random rand;
 
-		this.teacher_Cost = -1;
-		this.teacher_Position = new double[] {};
-		this.teacher_Constraint = new double[] {};
-		this.teacher_Penalty = -1;
+		this.cost_Best = -1;
+		this.position_Best = new double[] {};
+		this.constraint_Best = new double[] {};
+		this.penalty_Best = -1;
 		this.best_Eval = 0;
-		boolean best_Found = false;
 
-		this.evaluation_time = new ArrayList<Double>();
 		// Establish Population
 		int e = 0;
 		population = new ArrayList<Learner>();
@@ -44,19 +42,15 @@ public class STLBO {
 			population.add(new Learner(D,bounds_x));
 
 			// cycle through individual in population and evaluate fitness
-			long evaluation_start_time = System.nanoTime();
-
 			population.get(i).evaluate(1);
 
-			long evaluation_elapsed_time = (System.nanoTime() - evaluation_start_time);
-			this.evaluation_time.add((double)evaluation_elapsed_time);
 			e += 1;
 
-			if (population.get(i).cost < this.teacher_Cost || this.teacher_Cost == -1) {
-				this.teacher_Position = Arrays.copyOf(population.get(i).position, D);
-				this.teacher_Cost = population.get(i).cost;
-				this.teacher_Constraint = Arrays.copyOf(population.get(i).constraint,population.get(i).constraint.length);
-				this.teacher_Penalty = population.get(i).penalty;
+			if (population.get(i).cost < this.cost_Best || this.cost_Best == -1) {
+				this.position_Best = Arrays.copyOf(population.get(i).position, D);
+				this.cost_Best = population.get(i).cost;
+				this.constraint_Best = Arrays.copyOf(population.get(i).constraint,population.get(i).constraint.length);
+				this.penalty_Best = population.get(i).penalty;
 			}
 		}
 
@@ -81,7 +75,7 @@ public class STLBO {
 			for (int j = 0 ; j < D ; j++) {
 				mean_Variables[j] = mean_Variables[j]/ps;
 			}
-			double[] teacher_PositionGen = Arrays.copyOf(teacher_Position, D);
+			double[] position_BestGen = Arrays.copyOf(position_Best, D);
 
 			// modify solution based on teacher solution
 			for (int i = 0 ; i < ps ; i++) {
@@ -92,7 +86,7 @@ public class STLBO {
 
 				for (int j = 0 ; j < D ; j++) {
 					double r = Math.random();
-					difference_Mean[j] = r*(teacher_PositionGen[j] - Tf*mean_Variables[j]);
+					difference_Mean[j] = r*(position_BestGen[j] - Tf*mean_Variables[j]);
 				}
 
 				// update position based of mean difference of solutions
@@ -105,12 +99,8 @@ public class STLBO {
 
 				// evaluate new generated solution
 				if (e < fe) {
-					long evaluation_start_time = System.nanoTime();
-
 					newSolution.evaluate(gen+1);
 
-					long evaluation_elapsed_time = (System.nanoTime() - evaluation_start_time);
-					this.evaluation_time.add((double)evaluation_elapsed_time);
 					e += 1;
 
 					// is new solution better than existing?
@@ -121,16 +111,12 @@ public class STLBO {
 						population.get(i).penalty = newSolution.penalty;
 					}
 
-					if (population.get(i).cost < this.teacher_Cost) {
-						this.teacher_Position = Arrays.copyOf(population.get(i).position, D);
-						this.teacher_Cost = population.get(i).cost;
-						this.teacher_Constraint = Arrays.copyOf(population.get(i).constraint,population.get(i).constraint.length);
-						this.teacher_Penalty = population.get(i).penalty;
-					}
-
-					if (this.teacher_Cost <= Best && !best_Found) {
+					if (population.get(i).cost < this.cost_Best) {
+						this.position_Best = Arrays.copyOf(population.get(i).position, D);
+						this.cost_Best = population.get(i).cost;
+						this.constraint_Best = Arrays.copyOf(population.get(i).constraint,population.get(i).constraint.length);
+						this.penalty_Best = population.get(i).penalty;
 						this.best_Eval = e;
-						best_Found = true;
 					}
 				} else {
 					break;
@@ -171,12 +157,8 @@ public class STLBO {
 
 				// evaluate new generated solution
 				if (e < fe) {
-					long evaluation_start_time = System.nanoTime();
-
 					newSolution.evaluate(gen+1);
 
-					long evaluation_elapsed_time = (System.nanoTime() - evaluation_start_time);
-					this.evaluation_time.add((double)evaluation_elapsed_time);
 					e += 1;
 
 					// is new solution better than existing?
@@ -187,16 +169,12 @@ public class STLBO {
 						population.get(j).penalty = newSolution.penalty;
 					}
 
-					if (population.get(j).cost < this.teacher_Cost) {
-						this.teacher_Position = Arrays.copyOf(population.get(j).position, D);
-						this.teacher_Cost = population.get(j).cost;
-						this.teacher_Constraint = Arrays.copyOf(population.get(j).constraint,population.get(j).constraint.length);
-						this.teacher_Penalty = population.get(j).penalty;
-					}
-
-					if (this.teacher_Cost <= Best && !best_Found) {
+					if (population.get(j).cost < this.cost_Best) {
+						this.position_Best = Arrays.copyOf(population.get(j).position, D);
+						this.cost_Best = population.get(j).cost;
+						this.constraint_Best = Arrays.copyOf(population.get(j).constraint,population.get(j).constraint.length);
+						this.penalty_Best = population.get(j).penalty;
 						this.best_Eval = e;
-						best_Found = true;
 					}
 				} else {
 					break;
@@ -233,17 +211,17 @@ public class STLBO {
 				}
 			}
 
-			//System.out.println("Generation: " + (gen+1));
-			//System.out.println("Function Evaluations: " + e);
-			//System.out.println("Best Cost: " + this.teacher_Cost);
-			//System.out.println("Best Position: " + Arrays.toString(this.teacher_Position));
-			//System.out.println("Best Constraint: " + Arrays.toString(this.teacher_Constraint));
-			//System.out.println("Penalty: " + this.teacher_Penalty);
+			System.out.println("\nGeneration: " + (gen+1));
+			System.out.println("Function Evaluations: " + e);
+			System.out.println("Best Cost: " + this.cost_Best);
+			System.out.println("Best Position: " + Arrays.toString(this.position_Best));
+			System.out.println("Best Constraint: " + Arrays.toString(this.constraint_Best));
+			System.out.println("Penalty: " + this.penalty_Best);
 
-			this.evol.add(this.teacher_Cost);
-			this.evolPos[this.gen] = Arrays.copyOf(this.teacher_Position, D);
-			this.evolCons[this.gen] = Arrays.copyOf(this.teacher_Constraint, this.teacher_Constraint.length);
-			this.evolPen.add(this.teacher_Penalty);
+			this.evol.add(this.cost_Best);
+			this.evolPos[this.gen] = Arrays.copyOf(this.position_Best, D);
+			this.evolCons[this.gen] = Arrays.copyOf(this.constraint_Best, this.constraint_Best.length);
+			this.evolPen.add(this.penalty_Best);
 
 			this.gen++;
 		}
@@ -251,7 +229,7 @@ public class STLBO {
 }
 
 // LEARNER CLASS -------------------------------------------------------------+
-class Learner implements Reducer{
+class Learner implements Problem{
 
 	double[] position,constraint;
 	double cost,penalty;
@@ -263,13 +241,13 @@ class Learner implements Reducer{
         this.constraint = new double[] {};     	// individual constraints
         this.penalty = -1;    			 	 	// individual penalty
 
-        this.position =  Reducer.initial(D,bounds_x);
+        this.position =  Problem.initial(D,bounds_x);
 	}
 
 	// evaluate current fitness
 	public void evaluate(int i)
 	{
-		Object[] func = Reducer.costFunc(position,i);
+		Object[] func = Problem.costFunc(position,i);
 
 		cost = (double)func[0];
 	   	constraint = (double[])func[1];

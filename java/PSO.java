@@ -15,9 +15,9 @@ import java.io.*;
 // SWARM CLASS ---------------------------------------------------------------+
 public class PSO {
 
-	double cost_Best_g,penalty_Best_g,best_Eval;
+	double cost_Best,penalty_Best,best_Eval;
 	double[][] evolPos,evolCons;
-	double[] position_Best_g,constraint_Best_g;
+	double[] position_Best,constraint_Best;
 	ArrayList<Particle> swarm;
 	ArrayList<Double> evol,evolPen;
 	int gen;
@@ -26,10 +26,10 @@ public class PSO {
 
 	public PSO(double[][] bounds_x,double[][] bounds_v,int ps,int D,int fe) throws IOException{
 
-		this.cost_Best_g = -1;
-		this.position_Best_g = new double[] {};
-		this.constraint_Best_g = new double[] {};
-		this.penalty_Best_g = -1;
+		this.cost_Best = -1;
+		this.position_Best = new double[] {};
+		this.constraint_Best = new double[] {};
+		this.penalty_Best = -1;
 		this.best_Eval = 0;
 
 		// Establish Swarm
@@ -56,11 +56,11 @@ public class PSO {
 					e += 1;
 
 					// determine if current particle is the best (globally)
-					if (swarm.get(j).cost_Best_i < this.cost_Best_g || this.cost_Best_g == -1) {
-						this.position_Best_g = Arrays.copyOf(swarm.get(j).position_Best_i, D);
-						this.cost_Best_g = swarm.get(j).cost_Best_i;
-						this.constraint_Best_g = Arrays.copyOf(swarm.get(j).constraint_Best_i, swarm.get(j).constraint_Best_i.length);
-						this.penalty_Best_g = swarm.get(j).penalty_Best_i;
+					if (swarm.get(j).cost_Best_i < this.cost_Best || this.cost_Best == -1) {
+						this.position_Best = Arrays.copyOf(swarm.get(j).position_Best_i, D);
+						this.cost_Best = swarm.get(j).cost_Best_i;
+						this.constraint_Best = Arrays.copyOf(swarm.get(j).constraint_Best_i, swarm.get(j).constraint_Best_i.length);
+						this.penalty_Best = swarm.get(j).penalty_Best_i;
 						this.best_Eval = e;
 					}
 				} else {
@@ -70,21 +70,21 @@ public class PSO {
 
 			// cycle through swarm and update velocities and position
 			for (int k = 0 ; k < ps ; k++) {
-				swarm.get(k).update_velocity(this.position_Best_g,D,gen,maxiter,bounds_v);
+				swarm.get(k).update_velocity(this.position_Best,D,gen,maxiter,bounds_v);
 				swarm.get(k).update_position(bounds_x,D);
 			}
 
 			System.out.println("\nGeneration: " + (gen+1));
 			System.out.println("Function Evaluations: " + e);
-			System.out.println("Best Cost: " + this.cost_Best_g);
-			System.out.println("Best Position: " + Arrays.toString(this.position_Best_g));
-			System.out.println("Best Constraint: " + Arrays.toString(this.constraint_Best_g));
-			System.out.println("Penalty: " + this.penalty_Best_g);
+			System.out.println("Best Cost: " + this.cost_Best);
+			System.out.println("Best Position: " + Arrays.toString(this.position_Best));
+			System.out.println("Best Constraint: " + Arrays.toString(this.constraint_Best));
+			System.out.println("Penalty: " + this.penalty_Best);
 
-			this.evol.add(this.cost_Best_g);
-			this.evolPos[this.gen] = Arrays.copyOf(this.position_Best_g, D);
-			this.evolCons[this.gen] = Arrays.copyOf(this.constraint_Best_g, this.constraint_Best_g.length);
-			this.evolPen.add(this.penalty_Best_g);
+			this.evol.add(this.cost_Best);
+			this.evolPos[this.gen] = Arrays.copyOf(this.position_Best, D);
+			this.evolCons[this.gen] = Arrays.copyOf(this.constraint_Best, this.constraint_Best.length);
+			this.evolPen.add(this.penalty_Best);
 
 			this.gen++;
 		}
@@ -92,7 +92,7 @@ public class PSO {
 }
 
 // PARTICLE CLASS ------------------------------------------------------------+
-class Particle implements Reducer{
+class Particle implements Problem{
 
 	double[] position_i,velocity_i,position_Best_i;
 	double[] constraint_Best_i,constraint_i;
@@ -110,7 +110,7 @@ class Particle implements Reducer{
         this.penalty_i = -1;    			 	 // penalty individual
         this.penalty_Best_i = -1;      			 // penalty best individual
 
-        Object[] init =  Reducer.initial(D,bounds_x,bounds_v);
+        Object[] init = Problem.initial_pso(D,bounds_x,bounds_v);
 
         this.position_i = (double[])init[0];
 	   	this.velocity_i = (double[])init[1];
@@ -119,7 +119,7 @@ class Particle implements Reducer{
 	// evaluate current fitness
 	public void evaluate(int i)
 	{
-		Object[] func = Reducer.costFunc(position_i,i);
+		Object[] func = Problem.costFunc(position_i,i);
 
 		cost_i = (double)func[0];
 	   	constraint_i = (double[])func[1];
@@ -138,7 +138,7 @@ class Particle implements Reducer{
 	}
 
 	// update new particle velocity
-	public void update_velocity(double[] position_Best_g, int D, int i, int maxiter,double[][] bounds_v) {
+	public void update_velocity(double[] position_Best, int D, int i, int maxiter,double[][] bounds_v) {
 		double w,velocity_Cognitive,velocity_Social,r1,r2,c1,c2;
 		// linear decreasing weight
 		w = (0.9-0.4)*((double)(maxiter-i)/maxiter)+0.4;
@@ -151,7 +151,7 @@ class Particle implements Reducer{
 	   		r2 = Math.random();
 
 	   		velocity_Cognitive = c1*r1*(position_Best_i[j] - position_i[j]);
-	   		velocity_Social = c2*r2*(position_Best_g[j] - position_i[j]);
+	   		velocity_Social = c2*r2*(position_Best[j] - position_i[j]);
 
 	   		velocity_i[j] = w*velocity_i[j] + velocity_Cognitive + velocity_Social;
 
