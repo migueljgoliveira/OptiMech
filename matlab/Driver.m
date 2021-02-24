@@ -11,14 +11,14 @@
 function driver()
     clear; clc; close all;
     
-    fprintf('+++ OptiMech - Driver +++\n')
+    fprintf('+++ OptiMeta - Driver +++\n')
     
-    x = [3.49999 0.6999 17 7.3 7.8 3.3502 5.2866];
+    x = [1.0 1.0 1.0];
     i = 1;
     
 	[F, Gj, P] = problem(x,i);
     
-	fprintf(['Cost = ', num2str(F),'\n']) 
+	fprintf(['\nCost = ', num2str(F),'\n']) 
     fprintf(['Constraints = [',num2str(Gj),']\n'])
     fprintf(['Penalty = ',num2str(P),'\n'])
 end

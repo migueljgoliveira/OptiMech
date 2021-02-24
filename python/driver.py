@@ -13,9 +13,9 @@ from problem import costfunc
 
 # MAIN -----------------------------------------------------------------------+
 def main():
-	print ('+++ OptiMech - Driver +++')
+	print ('+++ OptiMeta - Driver +++')
 
-	x, i = [2.0,2.0,2.0], 1
+	x, i = [1.0,1.0,1.0], 1
 	F,x,Gj,P = costfunc(x,i)
 
 	print ('Cost = %r' % F)
